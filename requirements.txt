@@ -1,0 +1,6 @@
+docx2txt
+pdfminer.six
+bs4
+scikit-learn
+spacy==2.3.5
+nltk
