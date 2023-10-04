@@ -139,9 +139,9 @@ def calculate_coverage_score(resume_text, job_description):
 
     return coverage_score
 
-if __name__ == "__main__":
-    resume_path = 'resume.pdf'
-    job_description = "Bachelor's or Master’s degree in Computer Science, Engineering or related field, or equivalent training, fellowship, or work experience A track record of approximately 8+ years of solving platform-level problems for multiple teams across the stack by building and delivering production quality software systems Excellent communication skills: Clear written and oral communication is important to our ability to operate as a remote team and in building our relationship with our cross-functional partners Strong sense of ownership and customer empathy: Our mission is to create a seamless customer experience; understanding the intricacies of the customer journey and being proactive about doing right by our customers is critical to our success. Strong engineering fundamentals: we value transferable experience writing & debugging code, scaling existing services, and designing/architecting software systems. Proven expertise in their technology of choice. Ideally full-stack development experience using React, GraphQL, Ruby, Golang, ElasticSearch, and PostgresSQL."
+def match(resume_path, job_description):
+    # resume_path = 'resume.pdf'
+    # job_description = "Bachelor's or Master’s degree in Computer Science, Engineering or related field, or equivalent training, fellowship, or work experience A track record of approximately 8+ years of solving platform-level problems for multiple teams across the stack by building and delivering production quality software systems Excellent communication skills: Clear written and oral communication is important to our ability to operate as a remote team and in building our relationship with our cross-functional partners Strong sense of ownership and customer empathy: Our mission is to create a seamless customer experience; understanding the intricacies of the customer journey and being proactive about doing right by our customers is critical to our success. Strong engineering fundamentals: we value transferable experience writing & debugging code, scaling existing services, and designing/architecting software systems. Proven expertise in their technology of choice. Ideally full-stack development experience using React, GraphQL, Ruby, Golang, ElasticSearch, and PostgresSQL."
     resume_text = get_resume_text(resume_path)
 
     # fetch email and phone
@@ -153,4 +153,8 @@ if __name__ == "__main__":
 
     coverage_score = calculate_coverage_score(resume_text, job_description)
     print(f"JD Coverage Score: {coverage_score}%")
+    return coverage_score
+
+# if __name__ == "__main__":
+#     match()
 
