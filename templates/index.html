@@ -1,6 +1,93 @@
-<form method='post' action='/match'>
-    <h1>Hello World</h1>
-    <input type="file" name="resume"/>
-    <textarea name="job_description"></textarea>
-    <button type="submit">Match</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Resume Matching Solution</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f2f2f2;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background-color: #fff;
+                padding: 20px;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            h1 {
+                color: #333;
+            }
+
+            .input-container {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 20px;
+            }
+
+            .resume-input, .job-description-input {
+                flex: 1;
+                padding: 20px;
+                background-color: #f9f9f9;
+                border-radius: 5px;
+                box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            textarea, input[type="file"] {
+                width: 100%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            button {
+                background-color: #007BFF;
+                color: #fff;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+            #result {
+                margin-top: 20px;
+            }
+
+            #score {
+                font-size: 24px;
+                font-weight: bold;
+                color: #333;
+            }
+
+        </style>
+    </head>
+    <body>
+        <form class="container" method='post' action='/match' enctype="multipart/form-data">
+            <h1>AI Resume Matching Solution</h1>
+            <div class="input-container">
+                <div class="resume-input">
+                    <h2>Upload or Paste Resume</h2>
+                    <input type="file" name="resume" accept=".txt,.pdf,.docx,.html">
+                    <!-- <textarea id="resume-text" placeholder="Paste your resume text here"></textarea> -->
+                </div>
+                <div class="job-description-input">
+                    <h2>Paste Job Description</h2>
+                    <textarea name="job_description" placeholder="Paste the job description here"></textarea>
+                </div>
+            </div>
+            <button type="submit" id="calculate-score">Calculate Score</button>
+        </form>
+    </body>
+</html>

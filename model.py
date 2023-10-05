@@ -13,8 +13,8 @@ synonym_dict = {
     "analysis": ["analytics"],
     "ror": ["ruby", "ruby on rails"],
     "ruby": ["ruby", "ruby on rails"],
-    "javascript": ["js", "java script"],
-    "js": ["javascript", "java script"],
+    "javascript": ["js", "java script", "ecmascript", "client-side scripting"],
+    "js": ["js", "java script", "ecmascript", "client-side scripting"],
     "react": ["reactjs", "react.js"]
     # Add more synonyms as needed
 }
@@ -113,6 +113,7 @@ def extract_candidate_info(text):
     return {
         "Email": candidate_email,
         "Phone": candidate_phone,
+        "score": 0
     }
 
 # Function to calculate cosine similarity between two texts
@@ -132,7 +133,7 @@ def match_resume_with_job_description(resume_text, job_description):
     print(common_tokens)
     percentage_covered = len(common_tokens) / len(jd_tokens) if len(jd_tokens) > 0 else 0.0
 
-    return percentage_covered
+    return percentage_covered * 100
 
 def match(resume_path, job_description):
     # resume_path = 'resume.pdf'
@@ -141,11 +142,10 @@ def match(resume_path, job_description):
 
     # fetch email and phone
     info = extract_candidate_info(resume_text)
-    print(f"Candidate Info: {info}")
 
-    similarity_score = match_resume_with_job_description(resume_text, job_description)
-    print(f"Similarity Score: {similarity_score}")
-    return similarity_score
+    info["score"] = match_resume_with_job_description(resume_text, job_description)
+    print(f"info: {info}")
+    return info
 
 # if __name__ == "__main__":
 #     match('','')
