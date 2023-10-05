@@ -1,4 +1,5 @@
 import re
+import os
 import spacy
 # from spacy import displacy
 import docx2txt
@@ -50,6 +51,7 @@ def get_resume_text(resume_path):
     elif resume_path.endswith('.html'):
         resume_text = extract_text_from_html(resume_path)
     else:
+        os.remove(resume_path)
         raise ValueError("Unsupported resume format")
     return resume_text
 

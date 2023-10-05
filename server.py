@@ -34,6 +34,10 @@ def match_resume():
     else:
         # Handle the case where no file was uploaded
         return "No resume file uploaded."
+    
+@app.errorhandler(Exception)
+def internal_server_error(error):
+    return render_template('error.html', error=error)
 
 if __name__ == '__main__':
     app.run(debug=True)
