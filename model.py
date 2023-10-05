@@ -1,22 +1,21 @@
-import os
 import re
 import spacy
 import docx2txt
 from pdfminer.high_level import extract_text
 from bs4 import BeautifulSoup
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import wordnet
 
 # Create a synonym dictionary
 synonym_dict = {
-    "ML": ["machine learning"],
+    "ml": ["machine learning"],
     "analysis": ["analytics"],
-    "ror": ["ruby", "Ruby on Rails"],
-    "ruby": ["ruby", "Ruby on Rails"],
-    "JavaScript": ["JS", "Java Script"],
-    "js": ["JS", "Java Script"],
-    "React": ["ReactJS", "react.js"]
+    "ror": ["ruby", "ruby on rails"],
+    "ruby": ["ruby", "ruby on rails"],
+    "javascript": ["js", "java script"],
+    "js": ["javascript", "java script"],
+    "react": ["reactjs", "react.js"]
     # Add more synonyms as needed
 }
 
@@ -54,23 +53,35 @@ def get_resume_text(resume_path):
     return resume_text
 
 # Tokenize and preprocess text using spaCy and NLTK
-def preprocess_text(text):
-    text = re.sub(r'\s+', ' ', text).replace("\n", " ")
-    doc = nlp(text)
+def preprocess_jd(job_description):
+    job_description = job_description.replace("\n", " ")
+    job_description = re.sub(r'\s+', ' ', job_description)
+
+    doc = nlp(job_description)
     tokens = []
 
-    # Define entity types to be removed (e.g., PERSON, GPE for city, ADDRESS, EMAIL)
-    entities_to_remove = ["PERSON", "GPE", "ADDRESS", "EMAIL"]
+    # Define the relevant part-of-speech tags and dependency labels
+    relevant_pos_tags = ["NOUN", "PROPN", "ADJ"]
+    relevant_dependency_labels = ["amod", "compound", "nsubj", "attr", "conj"]
 
     for token in doc:
-        # Check if the token's entity type is not in the list of entities to remove
-        # print(token.ent_type_)
-        # print(token.text)
-        if token.ent_type_ not in entities_to_remove and not token.is_stop and not token.is_punct:
+        if (token.pos_ in relevant_pos_tags or token.dep_ in relevant_dependency_labels) and not token.is_stop and not token.is_punct:
             tokens.append(token.lemma_.lower())
-            
-    array = expand_synonyms(tokens)
-    return " ".join(array)
+ 
+    return tokens
+
+# Tokenize and preprocess text using spaCy and NLTK
+def preprocess_resume_text(resume_text):
+    resume_text = resume_text.replace("\n", " ")
+    resume_text = re.sub(r'\s+', ' ', resume_text)
+
+    doc = nlp(resume_text)
+    tokens = []
+
+    for token in doc:
+        tokens.append(token.lemma_.lower())
+ 
+    return expand_synonyms(tokens)
 
 # Function to expand synonyms
 def expand_synonyms(tokens):
@@ -83,11 +94,9 @@ def expand_synonyms(tokens):
 
 # Function to extract candidate information from a resume
 def extract_candidate_info(text):
-    # Initialize variables to store extracted information
     candidate_email = ""
     candidate_phone = ""
 
-    # Regular expression patterns for email and phone number extraction
     email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     phone_pattern = r'\b(?:\+\d{1,2}\s?)?\d{3,4}[-.\s]?\d{3,4}[-.\s]?\d{4}\b'
 
@@ -108,36 +117,22 @@ def extract_candidate_info(text):
 
 # Function to calculate cosine similarity between two texts
 def calculate_cosine_similarity(text1, text2):
-    vectorizer = CountVectorizer().fit_transform([text1, text2])
-    vectors = vectorizer.toarray()
+    vectors = TfidfVectorizer().fit_transform([text1, text2])
     return cosine_similarity([vectors[0]], [vectors[1]])[0][0]
 
 # Function to match a resume with a job description
 def match_resume_with_job_description(resume_text, job_description):
-    # Preprocess the text
-    resume_text = preprocess_text(resume_text)
-    job_description = preprocess_text(job_description)
+     # Preprocess and tokenize the text
+    jd_tokens = preprocess_jd(job_description)
+    resume_tokens = preprocess_resume_text(resume_text)
+    resume_tokens = expand_synonyms(resume_tokens)
 
-    # Calculate cosine similarity between the resume and job description
-    similarity_score = calculate_cosine_similarity(resume_text, job_description)
+    # Calculate the percentage of job description skills covered in the resume
+    common_tokens = set(jd_tokens).intersection(set(resume_tokens))
+    print(common_tokens)
+    percentage_covered = len(common_tokens) / len(jd_tokens) if len(jd_tokens) > 0 else 0.0
 
-    return similarity_score
-
-# Function to calculate coverage score
-def calculate_coverage_score(resume_text, job_description):
-    # Tokenize the job description into keywords or phrases
-    job_keywords = job_description.lower().split()
-
-    # Tokenize and preprocess the resume text
-    resume_tokens = preprocess_text(resume_text)
-
-    # Calculate the number of job keywords that appear in the resume
-    keywords_found = sum(1 for keyword in job_keywords if keyword in resume_tokens)
-
-    # Calculate the coverage score as a percentage
-    coverage_score = (keywords_found / len(job_keywords)) * 100
-
-    return coverage_score
+    return percentage_covered
 
 def match(resume_path, job_description):
     # resume_path = 'resume.pdf'
@@ -150,11 +145,7 @@ def match(resume_path, job_description):
 
     similarity_score = match_resume_with_job_description(resume_text, job_description)
     print(f"Similarity Score: {similarity_score}")
-
-    coverage_score = calculate_coverage_score(resume_text, job_description)
-    print(f"JD Coverage Score: {coverage_score}%")
-    return coverage_score
+    return similarity_score
 
 # if __name__ == "__main__":
-#     match()
-
+#     match('','')

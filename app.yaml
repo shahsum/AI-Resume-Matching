@@ -1,0 +1,10 @@
+runtime: python39  # Use the Python version you need
+entrypoint: gunicorn -b :$PORT server:main  # Replace "main:app" with your app's entry point
+
+instance_class: F2
+
+env_variables:
+  VARIABLE_NAME: "variable_value"  # Add any environment variables your app needs
+
+automatic_scaling:
+  target_cpu_utilization: 0.65
