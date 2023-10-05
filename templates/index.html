@@ -114,9 +114,16 @@
         button:hover, input[type="file"]:hover {
             background-color: #272a2e; /* Darker blue on hover */
         }
+
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+        }
     </style>
 </head>
 <body>
+    <img src="{{url_for('static', filename='logo.png')}}" alt="msci logo" class="logo">
     <div class="header">Resume Shortlister</div>
     <form class="container" method='post' action='/match' enctype="multipart/form-data">
         <div class="left-side">

@@ -1,5 +1,6 @@
 import re
 import spacy
+# from spacy import displacy
 import docx2txt
 from pdfminer.high_level import extract_text
 from bs4 import BeautifulSoup
@@ -76,6 +77,7 @@ def preprocess_resume_text(resume_text):
     resume_text = re.sub(r'\s+', ' ', resume_text)
 
     doc = nlp(resume_text)
+    # displacy.serve(doc, style="dep", port=5001)
     tokens = []
 
     for token in doc:
