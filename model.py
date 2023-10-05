@@ -111,9 +111,9 @@ def extract_candidate_info(text):
         candidate_phone = phone_match.group()
 
     return {
-        "Email": candidate_email,
-        "Phone": candidate_phone,
-        "score": 0
+        "email": candidate_email,
+        "phone": candidate_phone,
+        "accuracy": 0
     }
 
 # Function to calculate cosine similarity between two texts
@@ -143,7 +143,7 @@ def match(resume_path, job_description):
     # fetch email and phone
     info = extract_candidate_info(resume_text)
 
-    info["score"] = match_resume_with_job_description(resume_text, job_description)
+    info["accuracy"] = match_resume_with_job_description(resume_text, job_description)
     print(f"info: {info}")
     return info
 

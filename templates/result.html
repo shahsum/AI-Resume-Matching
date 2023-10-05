@@ -1,2 +1,213 @@
-<h2>result: {{similarity_score}}</h2>
-<a href="/">Back</a>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dynamic Table with Sorting and Row Selection</title>
+    <style>
+        /* Styling for the body */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #e9f3fd; /* Background color of the page */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Styling for the container */
+        .container {
+            text-align: center;
+            background-color: #e5eaee; /* Background color of the table content */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 80%; /* Set a fixed width for the container */
+        }
+
+        /* Styling for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #00008B; /* Header background color */
+            color: white; /* Header text color */
+            cursor: pointer;
+        }
+
+        /* Styling for the "Select Rows" section */
+        #selectRows {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Styling for the buttons */
+        button {
+            font-size: 18px; /* Increase the font size */
+            padding: 10px 20px; /* Increase padding to increase button size */
+        }
+
+        input[type="number"] {
+            width: 60px; /* Adjust the width as needed */
+            margin-right: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dynamic Table with Sorting and Row Selection</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th class="sortable" onclick="sortTable('accuracy')">Accuracy</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td><input type="checkbox" /></td>
+                    <td></td>
+                    <td>{{similarity_score.email}}</td>
+                    <td>{{similarity_score.phone}}</td>
+                    <td>{{similarity_score.accuracy}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- "Select Rows" section -->
+        <div id="selectRows">
+            <label for="numberOfRows">Select N number of rows:</label>
+            <input type="number" id="numberOfRows" name="numberOfRows" min="1" value="1">
+            <button onclick="selectRows()">Select Rows</button>
+            <button onclick="sendEmail()">Send Email</button>
+            <button onclick="downloadExcel()">Download Excel</button>
+            <a href="/">Back</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script>
+        // Sample JSON data
+        const jsonData = [
+            // { name: 'John Doe', email: 'john@example.com', accuracy: 85 },
+            // { name: 'Jane Smith', email: 'jane@example.com', accuracy: 92 },
+            // { name: 'Alice Johnson', email: 'alice@example.com', accuracy: 78 },
+            // ... (your data here)
+        ];
+
+        let sortedData = [...jsonData]; // Copy of the data for sorting
+
+        // Function to create a dynamic table
+        function createTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+            
+            data.forEach((rowData) => {
+                const row = document.createElement('tr');
+                const selectCell = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                selectCell.appendChild(checkbox);
+                row.appendChild(selectCell);
+
+                for (const key in rowData) {
+                    if (key !== 'selected') {
+                        const cell = document.createElement('td');
+                        cell.textContent = rowData[key];
+                        row.appendChild(cell);
+                    }
+                }
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Call the createTable function with the sample JSON data
+        // createTable(sortedData);
+
+        // Function to sort the table by a specified column
+        function sortTable(column) {
+            sortedData.sort((a, b) => b[column] - a[column]);
+            createTable(sortedData);
+        }
+
+        // Function to select the specified number of rows
+        function selectRows() {
+            const numberOfRows = parseInt(document.getElementById('numberOfRows').value, 10);
+
+            const tableRows = document.querySelectorAll('tbody tr');
+            for (let i = 0; i < tableRows.length; i++) {
+                const checkbox = tableRows[i].querySelector('input[type="checkbox"]');
+                checkbox.checked = i < numberOfRows;
+            }
+        }
+
+        // Function to simulate sending email to selected rows
+        function sendEmail() {
+            const selectedRows = [];
+            const tableRows = document.querySelectorAll('tbody tr');
+
+            for (const row of tableRows) {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    const name = row.cells[1].textContent;
+                    const email = row.cells[2].textContent;
+                    const accuracy = row.cells[3].textContent;
+                    selectedRows.push({ name, email, accuracy });
+                }
+            }
+
+            // Simulate sending email (replace this with your actual email sending code)
+            if (selectedRows.length > 0) {
+                alert('Sending email to selected rows:\n' + JSON.stringify(selectedRows, null, 2));
+            } else {
+                alert('No rows selected.');
+            }
+        }
+
+        // Function to download the table as an Excel file
+        function downloadExcel() {
+            const selectedRows = [];
+            const tableRows = document.querySelectorAll('tbody tr');
+
+            for (const row of tableRows) {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    const name = row.cells[1].textContent;
+                    const email = row.cells[2].textContent;
+                    const accuracy = row.cells[3].textContent;
+                    selectedRows.push({ name, email, accuracy });
+                }
+            }
+
+            if (selectedRows.length === 0) {
+                alert('No rows selected for download.');
+                return;
+            }
+
+            const xlsData = [['Name', 'Email', 'Accuracy']];
+
+            selectedRows.forEach((row) => {
+                xlsData.push([row.name, row.email, row.accuracy]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(xlsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+            XLSX.writeFile(wb, 'table_data.xlsx');
+        }
+    </script>
+</body>
+</html>
