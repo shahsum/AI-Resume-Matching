@@ -18,10 +18,11 @@ synonym_dict = {
     # Add more synonyms as needed
 }
 
-# Load spaCy's English model
+# Load spaCy's pre-trained English model
 nlp = spacy.load("en_core_web_sm")
 skills_nlp = spacy.blank("en")
 
+# create custom entity ruler with training data from https://github.com/kingabzpro/jobzilla_ai/blob/main/jz_skill_patterns.jsonl
 ruler = skills_nlp.create_pipe('entity_ruler')
 ruler.from_disk("data/skillsets.jsonl")
 skills_nlp.add_pipe(ruler)
