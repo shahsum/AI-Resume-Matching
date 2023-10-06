@@ -13,24 +13,26 @@ def index():
 # Define a route to handle form submission
 @app.route('/match', methods=['POST'])
 def match_resume():
-    resume_file = request.files['resume']
+    resume_files = request.files.getlist('resume')
     job_description = request.form['job_description']
+    results = []
 
-    # Check if a file was uploaded
-    if resume_file:
-        # Save the uploaded file to a specified directory
-        resume_filename = secure_filename(resume_file.filename)
-        resume_file.save(os.path.join('uploads', resume_filename))
+    for resume_file in resume_files:
+        if resume_file:
+            # Save the uploaded file to a specified directory
+            resume_filename = secure_filename(resume_file.filename)
+            resume_file.save(os.path.join('uploads', resume_filename))
 
-        # Process the resume and job description here (use the functions from the previous example)
-        # similarity_score = match_resume_with_job_description(resume_filepath, job_description)
-        resume_filepath = os.path.join('uploads', resume_filename)
-        data = match(resume_filepath, job_description)
+            # Process the resume and job description here (use the functions from the previous example)
+            # similarity_score = match_resume_with_job_description(resume_filepath, job_description)
+            resume_filepath = os.path.join('uploads', resume_filename)
+            data = match(resume_filepath, job_description)
+            results.append(data)
 
-        # Delete the uploaded file after processing (optional)
-        os.remove(resume_filepath)
-
-        return render_template('result.html', data=[data])
+            # Delete the uploaded file after processing (optional)
+            os.remove(resume_filepath)
+    if results:
+        return render_template('result.html', data=results)
     else:
         # Handle the case where no file was uploaded
         return "No resume file uploaded."

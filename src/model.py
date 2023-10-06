@@ -53,7 +53,7 @@ def fetch_uniq_skills(jd_tokens):
         if token.label_ == "SKILL":
             skills.append(token.lemma_.lower())
  
-    uniq_skills = set(" ".join(skills).split(" "))
+    uniq_skills = set(skills)
     return uniq_skills
 
 # Function to expand synonyms
@@ -95,6 +95,22 @@ def calculate_cosine_similarity(text1, text2):
     vectors = TfidfVectorizer().fit_transform([text1, text2])
     return cosine_similarity([vectors[0]], [vectors[1]])[0][0]
 
+def calculate_weighted_accuracy(jd_skills, common_skills):
+    weighted_accuracy = 0.0
+    jd_skills = list(jd_skills)
+
+    for skill in common_skills:
+        if skill in jd_skills:
+            # Assign a higher weight to skills based on their index in js_skills
+            weight = 1.0 / (1 + (jd_skills.index(skill) / 10))  # Inverse of the index
+            weighted_accuracy += weight
+    
+    # Normalize the weighted accuracy by dividing by the sum of weights
+    total_weight = sum(1.0 / (1 + (jd_skills.index(skill) / 10)) for skill in jd_skills)
+    
+    accuracy = (weighted_accuracy / total_weight) * 100 if total_weight > 0 else 0.0
+    return accuracy
+
 # Function to match a resume with a job description
 def match_resume_with_job_description(resume_text, job_description):
     # Process resume text
@@ -107,10 +123,12 @@ def match_resume_with_job_description(resume_text, job_description):
 
     # try to fetch info like email and phone from resume
     info = extract_candidate_info(resume_text)
+    common_skills = jd_tokens.intersection(set(resume_tokens))
+    accuracy = calculate_weighted_accuracy(jd_tokens, common_skills)
 
-    # Calculate the percentage of job description skills covered in the resume
-    info["common_skills"] = set(jd_tokens).intersection(set(resume_tokens))
-    info["accuracy"] = (len(info["common_skills"]) / len(jd_tokens) if len(jd_tokens) > 0 else 0.0)*100
+    info["jd_skills"] = jd_tokens
+    info["common_skills"] = common_skills
+    info["accuracy"] = accuracy
 
     return info
 

@@ -1,6 +1,6 @@
 import docx2txt
-from pdfminer.high_level import extract_text
 from bs4 import BeautifulSoup
+import fitz  # PyMuPDF
 
 # Function to extract text from a DOCX file
 def extract_text_from_docx(docx_path):
@@ -9,8 +9,21 @@ def extract_text_from_docx(docx_path):
 
 # Function to extract text from a PDF file
 def extract_text_from_pdf(pdf_path):
-    text = extract_text(pdf_path)
-    return text
+    text = ''
+    links = []
+    doc = fitz.open(pdf_path)
+
+    for page_num in range(doc.page_count):
+        page = doc[page_num]
+        page_text = page.get_text("text")
+        text += " "+page_text
+
+        for link in page.get_links():
+            if "uri" in link:
+                links.append(link["uri"])
+
+    links.append(text)
+    return " ".join(links)
 
 # Function to extract text from an HTML file
 def extract_text_from_html(html_path):
