@@ -23,18 +23,17 @@ def match_resume():
             resume_filename = secure_filename(resume_file.filename)
             resume_file.save(os.path.join('uploads', resume_filename))
 
-            # Process the resume and job description here (use the functions from the previous example)
-            # similarity_score = match_resume_with_job_description(resume_filepath, job_description)
+            # Process the resume and job description
             resume_filepath = os.path.join('uploads', resume_filename)
             data = match(resume_filepath, job_description)
             results.append(data)
 
-            # Delete the uploaded file after processing (optional)
+            # Delete the uploaded file after processing
             os.remove(resume_filepath)
     if results:
-        return render_template('result.html', data=results)
+        sorted_data = sorted(results, key=lambda x: x["accuracy"], reverse=True)
+        return render_template('result.html', data=sorted_data)
     else:
-        # Handle the case where no file was uploaded
         return "No resume file uploaded."
     
 @app.errorhandler(Exception)

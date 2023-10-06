@@ -98,7 +98,7 @@
 <body>
     <img src="{{url_for('static', filename='logo.png')}}" alt="msci logo" class="logo">
     <div class="container">
-        <h1>Candidates information</h1>
+        <h1>Candidates Scores</h1>
         <div style="overflow: auto;height: 430px;">
             <table>
                 <thead>
@@ -108,6 +108,8 @@
                         <th>Email</th>
                         <th>Contact No</th> <!-- New column for Contact No -->
                         <th class="sortable" onclick="sortTable('accuracy')">Accuracy</th>
+                        <th>Matching Skills</th>
+                        <th>Rquired Skills</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -117,7 +119,9 @@
                         <td>{{item["name"]}}</td>
                         <td>{{item["email"]}}</td>
                         <td>{{item["phone"]}}</td>
-                        <td>{{item["accuracy"]}}</td>
+                        <td>{{ "{:.2f}%".format(item["accuracy"]) }}</td>
+                        <td>{{", ".join(item["common_skills"])}}</td>
+                        <td>{{", ".join(item["jd_skills"])}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -161,7 +165,9 @@
                     const email = row.cells[2].textContent;
                     const contactNo = row.cells[3].textContent;
                     const accuracy = row.cells[4].textContent;
-                    selectedRows.push({ name, email, contactNo, accuracy });
+                    const matchingSkills = row.cells[5].textContent;
+                    const requiredSkills = row.cells[6].textContent;
+                    selectedRows.push({ name, email, contactNo, accuracy, matchingSkills, requiredSkills });
                 }
             }
 
@@ -190,7 +196,9 @@
                     const email = row.cells[2].textContent;
                     const contactNo = row.cells[3].textContent;
                     const accuracy = row.cells[4].textContent;
-                    selectedRows.push({ name, email, contactNo, accuracy });
+                    const matchingSkills = row.cells[5].textContent;
+                    const requiredSkills = row.cells[6].textContent;
+                    selectedRows.push({ name, email, contactNo, accuracy, matchingSkills, requiredSkills });
                 }
             }
 
@@ -201,7 +209,7 @@
 
             const xlsData = [['Name', 'Email', 'Contact No', 'Accuracy']];
             selectedRows.forEach((row) => {
-                xlsData.push([row.name, row.email, row.contactNo, row.accuracy]);
+                xlsData.push([row.name, row.email, row.contactNo, row.accuracy, row.matchingSkills, row.requiredSkills]);
             });
 
             const ws = XLSX.utils.aoa_to_sheet(xlsData);
