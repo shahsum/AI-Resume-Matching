@@ -1,5 +1,4 @@
 docx2txt
-pdfminer.six
 PyMuPDF
 bs4
 scikit-learn
