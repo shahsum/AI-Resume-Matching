@@ -25,12 +25,12 @@ def match_resume():
         # Process the resume and job description here (use the functions from the previous example)
         # similarity_score = match_resume_with_job_description(resume_filepath, job_description)
         resume_filepath = os.path.join('uploads', resume_filename)
-        similarity_score = match(resume_filepath, job_description)
+        data = match(resume_filepath, job_description)
 
         # Delete the uploaded file after processing (optional)
         os.remove(resume_filepath)
 
-        return render_template('result.html', similarity_score=similarity_score)
+        return render_template('result.html', data=[data])
     else:
         # Handle the case where no file was uploaded
         return "No resume file uploaded."

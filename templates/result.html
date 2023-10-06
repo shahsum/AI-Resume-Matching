@@ -1,14 +1,16 @@
+
+
+    
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Candidate information </title>
     <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='favicon.ico')}}">
-    <title>Results</title>
     <style>
         /* Styling for the body */
         body {
             margin: 0;
             padding: 0;
-            background-color: #e9f3fd; /* Background color of the page */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,11 +20,12 @@
         /* Styling for the container */
         .container {
             text-align: center;
-            background-color: #e5eaee; /* Background color of the table content */
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            width: 80%; /* Set a fixed width for the container */
+            width: 80%;
+            height: 506px;
+            /* Set a fixed width for the container */
         }
 
         /* Styling for the table */
@@ -31,15 +34,21 @@
             border-collapse: collapse;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 10px;
         }
 
         th {
-            background-color: #00008B; /* Header background color */
-            color: white; /* Header text color */
+            background-color: rgb(0, 121, 212);
+            /* Header background color */
+            color: white;
+            /* Header text color */
             cursor: pointer;
+            position: sticky;
+            top: 0;
         }
 
         /* Styling for the "Select Rows" section */
@@ -47,17 +56,33 @@
             margin-top: 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            width: 600px;
+            float: right;
+            top: 20px;
+            position: relative;
         }
 
         /* Styling for the buttons */
         button {
-            font-size: 18px; /* Increase the font size */
-            padding: 10px 20px; /* Increase padding to increase button size */
+            font-size: 18px;
+            /* Increase the font size */
+            padding: 10px 20px;
+            /* Increase padding to increase button size */
+            border-radius: 100px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            background-color: rgb(0, 121, 212);
+            color: white;
+            border: 1px solid rgb(90, 121, 212);
+            outline: blue;
         }
 
         input[type="number"] {
-            width: 60px; /* Adjust the width as needed */
+            width: 60px;
+            /* Adjust the width as needed */
             margin-right: 10px;
             text-align: center;
         }
@@ -69,93 +94,55 @@
         }
     </style>
 </head>
+
 <body>
     <img src="{{url_for('static', filename='logo.png')}}" alt="msci logo" class="logo">
     <div class="container">
-        <h1>Results</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Select</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th class="sortable" onclick="sortTable('accuracy')">Accuracy</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr>
-                    <td><input type="checkbox" /></td>
-                    <td></td>
-                    <td>{{similarity_score.email}}</td>
-                    <td>{{similarity_score.phone}}</td>
-                    <td>{{similarity_score.accuracy}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <h1>Candidates information</h1>
+        <div style="overflow: auto;height: 430px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Contact No</th> <!-- New column for Contact No -->
+                        <th class="sortable" onclick="sortTable('accuracy')">Accuracy</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for item in data %}
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td>{{item["name"]}}</td>
+                        <td>{{item["email"]}}</td>
+                        <td>{{item["phone"]}}</td>
+                        <td>{{item["accuracy"]}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <!-- "Select Rows" section -->
         <div id="selectRows">
-            <label for="numberOfRows">Select N number of rows:</label>
+            <label for="numberOfRows">Select N rows:</label>
             <input type="number" id="numberOfRows" name="numberOfRows" min="1" value="1">
             <button onclick="selectRows()">Select Rows</button>
             <button onclick="sendEmail()">Send Email</button>
             <button onclick="downloadExcel()">Download Excel</button>
-            <a href="/">Back</a>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
     <script>
-        // Sample JSON data
-        const jsonData = [
-            // { name: 'John Doe', email: 'john@example.com', accuracy: 85 },
-            // { name: 'Jane Smith', email: 'jane@example.com', accuracy: 92 },
-            // { name: 'Alice Johnson', email: 'alice@example.com', accuracy: 78 },
-            // ... (your data here)
-        ];
-
-        let sortedData = [...jsonData]; // Copy of the data for sorting
-
-        // Function to create a dynamic table
-        function createTable(data) {
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = ''; // Clear existing rows
-            
-            data.forEach((rowData) => {
-                const row = document.createElement('tr');
-                const selectCell = document.createElement('td');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                selectCell.appendChild(checkbox);
-                row.appendChild(selectCell);
-
-                for (const key in rowData) {
-                    if (key !== 'selected') {
-                        const cell = document.createElement('td');
-                        cell.textContent = rowData[key];
-                        row.appendChild(cell);
-                    }
-                }
-
-                tableBody.appendChild(row);
-            });
-        }
-
-        // Call the createTable function with the sample JSON data
-        // createTable(sortedData);
-
-        // Function to sort the table by a specified column
-        function sortTable(column) {
-            sortedData.sort((a, b) => b[column] - a[column]);
-            createTable(sortedData);
-        }
 
         // Function to select the specified number of rows
+
         function selectRows() {
             const numberOfRows = parseInt(document.getElementById('numberOfRows').value, 10);
-
             const tableRows = document.querySelectorAll('tbody tr');
+
             for (let i = 0; i < tableRows.length; i++) {
                 const checkbox = tableRows[i].querySelector('input[type="checkbox"]');
                 checkbox.checked = i < numberOfRows;
@@ -172,10 +159,13 @@
                 if (checkbox.checked) {
                     const name = row.cells[1].textContent;
                     const email = row.cells[2].textContent;
-                    const accuracy = row.cells[3].textContent;
-                    selectedRows.push({ name, email, accuracy });
+                    const contactNo = row.cells[3].textContent;
+                    const accuracy = row.cells[4].textContent;
+                    selectedRows.push({ name, email, contactNo, accuracy });
                 }
             }
+
+ 
 
             // Simulate sending email (replace this with your actual email sending code)
             if (selectedRows.length > 0) {
@@ -185,7 +175,10 @@
             }
         }
 
+ 
+
         // Function to download the table as an Excel file
+
         function downloadExcel() {
             const selectedRows = [];
             const tableRows = document.querySelectorAll('tbody tr');
@@ -195,8 +188,9 @@
                 if (checkbox.checked) {
                     const name = row.cells[1].textContent;
                     const email = row.cells[2].textContent;
-                    const accuracy = row.cells[3].textContent;
-                    selectedRows.push({ name, email, accuracy });
+                    const contactNo = row.cells[3].textContent;
+                    const accuracy = row.cells[4].textContent;
+                    selectedRows.push({ name, email, contactNo, accuracy });
                 }
             }
 
@@ -205,10 +199,9 @@
                 return;
             }
 
-            const xlsData = [['Name', 'Email', 'Accuracy']];
-
+            const xlsData = [['Name', 'Email', 'Contact No', 'Accuracy']];
             selectedRows.forEach((row) => {
-                xlsData.push([row.name, row.email, row.accuracy]);
+                xlsData.push([row.name, row.email, row.contactNo, row.accuracy]);
             });
 
             const ws = XLSX.utils.aoa_to_sheet(xlsData);
@@ -219,3 +212,4 @@
     </script>
 </body>
 </html>
+    
