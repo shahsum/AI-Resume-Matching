@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from model import match
+from src.model import match
 import os
 from werkzeug.utils import secure_filename
 
